@@ -26,4 +26,4 @@ data binding between c# view model and angular.js view
 
 ##Limitations
 - The HTML view can only directly change simple data type fields. It cannot create or move objects in the view model tree. However, complex view logic can be implemented as a method in the view model and executed by the view.
-- A nested view model must only be referenced once in the view model tree because each nested view model object keeps a reference to the parent object. This parent/child relationship is used to bubble the INotifyPropertyChanged event and traverse the view model tree bottom-up via property paths like "propertyX.propertyY[42].propertyZ".
+- A nested view model must only be referenced once in the view model tree because each nested view model object keeps a reference to the parent object. This parent/child relationship is used to bubble up the INotifyPropertyChanged event and traverse the view model tree bottom-up via property paths like "propertyX.propertyY[42].propertyZ".
