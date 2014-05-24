@@ -2,7 +2,8 @@
 
 function log(message) {
     var element = document.getElementById("log");
-    element.value = message + "\n" + element.value;
+    if(element)
+        element.value = message + "\n" + element.value;
     if (console && console.log)
         console.log(message);
 }
