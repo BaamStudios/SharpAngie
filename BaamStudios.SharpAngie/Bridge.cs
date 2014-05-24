@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ServiceStack.Text;
 
 namespace BaamStudios.SharpAngie
@@ -9,6 +10,8 @@ namespace BaamStudios.SharpAngie
 
         private readonly ViewModelBase _viewModel;
         private readonly IAngularInterface _angularInterface;
+
+        private Dictionary<string, ViewModelBase.DeepPropertyChangedEventHandler> _propertyChangedEventHandlersByClient = new Dictionary<string, ViewModelBase.DeepPropertyChangedEventHandler>();
 
         public Bridge(ViewModelBase viewModel, IAngularInterface angularInterface)
         {
@@ -24,13 +27,39 @@ namespace BaamStudios.SharpAngie
         {
             var modelJson = JsonSerializer.SerializeToString(_viewModel);
             _angularInterface.SetModel(clientId, modelJson);
-
-            _viewModel.DeepPropertyChanged += (s, propertyPath, value) =>
+            
+            ViewModelBase.DeepPropertyChangedEventHandler handler;
+            if (string.IsNullOrEmpty(clientId) || !_propertyChangedEventHandlersByClient.TryGetValue(clientId, out handler))
             {
-                if (_changingPropertyFromJs == propertyPath) return;
-                var valueJson = value != null ? JsonSerializer.SerializeToString(value) : null;
-                _angularInterface.SetModelProperty(clientId, propertyPath, valueJson);
-            };
+                handler = (s, propertyPath, value) =>
+                {
+                    if (_changingPropertyFromJs == propertyPath) return;
+                    var valueJson = value != null ? JsonSerializer.SerializeToString(value) : null;
+                    _angularInterface.SetModelProperty(clientId, propertyPath, valueJson);
+                };
+
+                if (!string.IsNullOrEmpty(clientId))
+                {
+                    _propertyChangedEventHandlersByClient.Add(clientId, handler);
+                }
+            }
+
+            _viewModel.DeepPropertyChanged += handler;
+        }
+
+        /// <summary>
+        /// For a clean disposal of event handlers, call this method when a client has closed the html page.
+        /// This is not necessary if the client id is null or empty.
+        /// </summary>
+        /// <param name="clientId">User defined identifier for the client.</param>
+        public void OnClientDisconnected(string clientId)
+        {
+            ViewModelBase.DeepPropertyChangedEventHandler handler;
+            if (!string.IsNullOrEmpty(clientId) && _propertyChangedEventHandlersByClient.TryGetValue(clientId, out handler))
+            {
+                _viewModel.DeepPropertyChanged -= handler;
+                _propertyChangedEventHandlersByClient.Remove(clientId);
+            }
         }
 
         /// <summary>

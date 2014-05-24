@@ -2,3 +2,5 @@
 /BaamStudios.SharpAngie/obj
 /BaamStudios.SharpAngieDemo/bin
 /BaamStudios.SharpAngieDemo/obj
+/*.suo
+/packages
