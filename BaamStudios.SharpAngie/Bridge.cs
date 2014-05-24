@@ -16,6 +16,10 @@ namespace BaamStudios.SharpAngie
             _angularInterface = angularInterface;
         }
 
+        /// <summary>
+        /// The javascript object window.sharpAngieBridge should be set up so that any call to sharpAngieBridge.initialize() will be forwarded to this method.
+        /// </summary>
+        /// <param name="clientId">User defined identifier for the client. Will be forwarded to IAngularInterface. can be null if not needed.</param>
         public void Initialize(string clientId)
         {
             var modelJson = JsonSerializer.SerializeToString(_viewModel);
@@ -29,12 +33,18 @@ namespace BaamStudios.SharpAngie
             };
         }
 
+        /// <summary>
+        /// The javascript object window.sharpAngieBridge should be set up so that any call to sharpAngieBridge.setProperty(propertyPath, value) will be forwarded to this method.
+        /// </summary>
         public void SetViewModelProperty(string propertyPath, object value)
         {
             ReflectionsHelper.SetDeepProperty(_viewModel, propertyPath, value, () => _changingPropertyFromJs = propertyPath,
                 () => _changingPropertyFromJs = null);
         }
 
+        /// <summary>
+        /// The javascript object window.sharpAngieBridge should be set up so that any call to sharpAngieBridge.invokeMethod(methodPath, args) will be forwarded to this method.
+        /// </summary>
         public void InvokeViewModelMethod(string methodPath, object[] args)
         {
             ReflectionsHelper.InvokeDeepMethod(_viewModel, methodPath, args);
