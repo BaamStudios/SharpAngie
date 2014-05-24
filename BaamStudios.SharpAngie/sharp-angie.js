@@ -1,4 +1,4 @@
-﻿var sharpAngieApp = angular.module('sharpAngieApp', []);
+﻿var sharpAngieApp = angular.module('sharpAngieApp', typeof (angularModules) !== 'undefined' ? angularModules : []);
 
 function log(message) {
     var element = document.getElementById("log");
@@ -62,6 +62,9 @@ function wrapProperty(model, propertyName, parentPropertyPath) {
 /* converts fields to properties and adds helper functions to the model */
 function hookModel(model, parentPropertyPath) {
 
+    if (model == null || typeof (model) === 'undefined')
+        return model;
+    
     model.toJSON = function () {
         var result = {};
         for (var p in model) {
@@ -169,6 +172,8 @@ sharpAngieApp.controller('SharpAngieController', function SharpAngieController($
         // set value
         if (typeof (targetObject) !== 'undefined' && targetProperty) {
             var value = typeof (valueJson !== 'undefined') ? JSON.parse(valueJson) : undefined;
+            if (value == null)
+                value = undefined;
             $scope.safeApply(function () {
                 log("c#: " + propertyPath + "=" + valueJson);
                 var backingFieldName = getBackingFieldName(targetProperty);

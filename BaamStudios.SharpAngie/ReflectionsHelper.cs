@@ -88,8 +88,14 @@ namespace BaamStudios.SharpAngie
             if (!Equals(oldValue, value))
             {
                 if (beforeSet != null) beforeSet();
-                SetPropertyValue(targetPropertyOwner, targetProperty, targetPropertyIndex, value);
-                if (afterSet != null) afterSet();
+                try
+                {
+                    SetPropertyValue(targetPropertyOwner, targetProperty, targetPropertyIndex, value);
+                }
+                finally
+                {
+                    if (afterSet != null) afterSet();
+                }
             }
         }
 
@@ -180,6 +186,8 @@ namespace BaamStudios.SharpAngie
 
                 if (parameterType == typeof (string))
                     parameters[i] = arg != null ? arg.ToString() : null;
+                else if (parameterType == typeof (Guid))
+                    parameters[i] = arg != null ? Guid.Parse(arg.ToString()) : Guid.Empty;
                 else
                     parameters[i] = Convert.ChangeType(arg, parameterType);
             }
