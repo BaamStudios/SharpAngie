@@ -17,6 +17,13 @@ data binding between c# view model and angular.js view
 - HTML views with vanilla angular.js syntax. No custom "ng-" attributes necessary. [Example](/BaamStudios.SharpAngieDemo/DemoView.html)
 - TwoWay data binding.
 
+##Instructions
+- Implement your view model like [this](/BaamStudios.SharpAngieDemo/DemoViewModel.cs).
+- Implement your HTML view like [this](/BaamStudios.SharpAngieDemo/DemoView.html).
+- Implement [IAngularInterface](/BaamStudios.SharpAngie/IAngularInterface.cs) with your custom code to forward the calls from C# to JavaScript. See [WebViewBridge](/BaamStudios.SharpAngieDemo/WebViewBridge.cs) for an awesomium implementation.
+- Create an instance of [Bridge](/BaamStudios.SharpAngie/Bridge.cs).
+- Create the JavaScript object [window.sharpAngieBridge](/BaamStudios.SharpAngie/Bridge.cs) with your custom code to forward the calls from JavaScript to C#. See [WebViewBridge](/BaamStudios.SharpAngieDemo/WebViewBridge.cs) for an awesomium implementation.
+
 ##Limitations
 - The HTML view can only directly change simple data type fields. It cannot create or move objects in the view model tree. However, complex view logic can be implemented as a method in the view model and executed by the view.
 - A nested view model must only be referenced once in the view model tree because each nested view model object keeps a reference to the parent object. This parent/child relationship is used to traverse the view model tree via property paths like "propertyX.propertyY[42].propertyZ".
