@@ -1,0 +1,65 @@
+﻿<Window x:Class="BaamStudios.SharpAngieDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:awe="http://schemas.awesomium.com/winfx"
+        Title="MainWindow"
+        Width="1200"
+        Height="500">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Field1" />
+            <TextBlock Grid.Row="1" Text="Field2" />
+            <TextBlock Grid.Row="2" Text="Child.Field1" />
+            <TextBlock Grid.Row="3" Text="Child.Field2" />
+            <TextBlock Grid.Row="4" Text="Children[0].Field1" />
+            <TextBlock Grid.Row="5" Text="Children[0].Field2" />
+            <TextBox Grid.Column="1" Text="{Binding Field1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Grid.Row="1"
+                     Grid.Column="1"
+                     Text="{Binding Field2,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Grid.Row="2"
+                     Grid.Column="1"
+                     Text="{Binding Child.Field1,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Grid.Row="3"
+                     Grid.Column="1"
+                     Text="{Binding Child.Field2,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Grid.Row="4"
+                     Grid.Column="1"
+                     Text="{Binding Children[0].Field1,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Grid.Row="5"
+                     Grid.Column="1"
+                     Text="{Binding Children[0].Field2,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+        <awe:WebControl x:Name="WebControl"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch" />
+    </Grid>
+</Window>

@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="sharpAngieApp">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="angular.min.js"></script>
+    <script src="sharp-angie.js"></script>
+</head>
+    <body ng-controller="SharpAngieController" style="background: lightblue">
+        <table>
+            <tr>
+                <td>Field1:</td>
+                <td><input ng-model="model.Field1">{{model.Field1}}</td>
+            </tr>
+            <tr>
+                <td>Field2:</td>
+                <td><input ng-model="model.Field2">{{model.Field2}}</td>
+            </tr>
+            <tr>
+                <td>Child.Field1:</td>
+                <td><input ng-model="model.Child.Field1">{{model.Child.Field1}}</td>
+            </tr>
+            <tr>
+                <td>Child.Field2:</td>
+                <td><input ng-model="model.Child.Field2">{{model.Child.Field2}}</td>
+            </tr>
+            <tr>
+                <td>Children[0].Field1:</td>
+                <td><input ng-model="model.Children[0].Field1">{{model.Children[0].Field1}}</td>
+            </tr>
+            <tr>
+                <td>Children[0].Field2:</td>
+                <td><input ng-model="model.Children[0].Field2">{{model.Children[0].Field2}}</td>
+            </tr>
+        </table>
+        <button ng-click="model.Children[0].invokeMethod('DoSomething', 'v1', 'v2')">Children[0].DoSomething</button>
+        <textarea id="log" style="width: 90%; height: 200px"></textarea>
+    </body>
+</html>
