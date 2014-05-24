@@ -15,7 +15,7 @@ data binding between c# view model and angular.js view
 ##What you get
 - C# view models with minimal code. [Example](/BaamStudios.SharpAngieDemo/DemoViewModel.cs)
 - HTML views with vanilla angular.js syntax. No custom "ng-" attributes necessary. [Example](/BaamStudios.SharpAngieDemo/DemoView.html)
-- TwoWay data binding.
+- TwoWay data binding between the view model and the view. The transport layer between them can be fully customized and may even run on the network, so the view model can be on a web server while the HTML view runs on the client. [SignalR](http://signalr.net/) is compatible.
 
 ##Instructions
 - Implement your view model like [this](/BaamStudios.SharpAngieDemo/DemoViewModel.cs).
