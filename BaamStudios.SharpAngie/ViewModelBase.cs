@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
@@ -35,7 +37,8 @@ namespace BaamStudios.SharpAngie
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 
-            var value = GetType().GetProperty(propertyName).GetValue(this);
+            var propertyInfo = GetType().GetProperty(propertyName);
+            var value = propertyInfo != null ? propertyInfo.GetValue(this) : null;
             OnDeepPropertyChanged(this, propertyName, null, null, value);
         }
 
