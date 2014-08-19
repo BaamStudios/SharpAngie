@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ServiceStack.Text;
 
 namespace BaamStudios.SharpAngie
@@ -7,6 +8,7 @@ namespace BaamStudios.SharpAngie
     public class Bridge
     {
         private string _changingPropertyFromJs;
+        private string _currentClientId;
 
         private readonly ViewModelBase _viewModel;
         private readonly IAngularInterface _angularInterface;
@@ -27,13 +29,13 @@ namespace BaamStudios.SharpAngie
         {
             var modelJson = JsonSerializer.SerializeToString(_viewModel);
             _angularInterface.SetModel(clientId, modelJson);
-            
+
             ViewModelBase.DeepPropertyChangedEventHandler handler;
             if (string.IsNullOrEmpty(clientId) || !_propertyChangedEventHandlersByClient.TryGetValue(clientId, out handler))
             {
                 handler = (s, propertyPath, value) =>
                 {
-                    if (_changingPropertyFromJs == propertyPath) return;
+                    if (_currentClientId == clientId && _changingPropertyFromJs == propertyPath.Replace('[', '.').Replace("]", "")) return;
                     var valueJson = value != null ? JsonSerializer.SerializeToString(value) : null;
                     _angularInterface.SetModelProperty(clientId, propertyPath, valueJson);
                 };
@@ -65,16 +67,25 @@ namespace BaamStudios.SharpAngie
         /// <summary>
         /// The javascript object window.sharpAngieBridge should be set up so that any call to sharpAngieBridge.setProperty(propertyPath, value) will be forwarded to this method.
         /// </summary>
-        public void SetViewModelProperty(string propertyPath, object value)
+        public void SetViewModelProperty(string clientId, string propertyPath, object value)
         {
-            ReflectionsHelper.SetDeepProperty(_viewModel, propertyPath, value, () => _changingPropertyFromJs = propertyPath,
-                () => _changingPropertyFromJs = null);
+            ReflectionsHelper.SetDeepProperty(_viewModel, propertyPath, value, 
+                () =>
+                {
+                    _changingPropertyFromJs = propertyPath;
+                    _currentClientId = clientId;
+                },
+                () =>
+                {
+                    _changingPropertyFromJs = null;
+                    _currentClientId = clientId;
+                });
         }
 
         /// <summary>
         /// The javascript object window.sharpAngieBridge should be set up so that any call to sharpAngieBridge.invokeMethod(methodPath, args) will be forwarded to this method.
         /// </summary>
-        public void InvokeViewModelMethod(string methodPath, object[] args)
+        public void InvokeViewModelMethod(string clientId, string methodPath, object[] args)
         {
             ReflectionsHelper.InvokeDeepMethod(_viewModel, methodPath, args);
         }

@@ -33,14 +33,14 @@ namespace BaamStudios.SharpAngieDemo
         {
             var propertyPath = e.Arguments[0];
             var value = ToObject(e.Arguments[1]);
-            _bridge.SetViewModelProperty(propertyPath, value);
+            _bridge.SetViewModelProperty(string.Empty, propertyPath, value);
         }
 
         private void InvokeViewModelMethod(object sender, JavascriptMethodEventArgs e)
         {
             var methodPath = e.Arguments[0];
             var args = ((JSValue[])e.Arguments[1]).Select(ToObject).ToArray();
-            _bridge.InvokeViewModelMethod(methodPath, args);
+            _bridge.InvokeViewModelMethod(string.Empty, methodPath, args);
         }
 
         private static object ToObject(JSValue e)
