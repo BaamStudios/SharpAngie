@@ -116,7 +116,7 @@ namespace BaamStudios.SharpAngie
         {
             if (propertyIndex == null)
             {
-                property.SetValue(propertyOwner, value);
+                property.SetValue(propertyOwner, Convert.ChangeType(value, property.PropertyType));
                 return;
             }
 
@@ -124,7 +124,7 @@ namespace BaamStudios.SharpAngie
             if (list == null)
                 return;
 
-            list[propertyIndex.Value] = value;
+            list[propertyIndex.Value] = Convert.ChangeType(value, list.GetType().GenericTypeArguments[0]);
         }
 
         private static void GetDeepMethod(object rootObject, string methodPath, out object methodOwner, out string methodName)
