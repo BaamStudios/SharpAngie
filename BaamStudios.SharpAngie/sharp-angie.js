@@ -47,7 +47,7 @@ function wrapProperty(model, propertyName, parentPropertyPath) {
             set: function (value) {
                 log("js: " + pp + "=" + value);
                 model[backingFieldName] = value;
-                sharpAngieBridge.setProperty(pp, value);
+                sharpAngieBridge.setProperty(pp, value, model, propertyName);
             }
         });
     })(propertyName, propertyPath);
