@@ -35,6 +35,29 @@ namespace BaamStudios.SharpAngieDemo
                                         },
                                 Children = new ObservableCollection<DemoViewModel>(new List<DemoViewModel> { new DemoViewModel { Field1 = "baz" } })
                             };
+            viewModel.IndexedChildren = new Dictionary<string, DemoViewModel>
+            {
+                {
+                    "a",
+                    new DemoViewModel
+                    {
+                        Field1 = "ia",
+                        Parent = viewModel,
+                        ParentPropertyName = "IndexedChildren",
+                        ParentPropertyIndex = "a"
+                    }
+                },
+                {
+                    "b",
+                    new DemoViewModel
+                    {
+                        Field1 = "ib",
+                        Parent = viewModel,
+                        ParentPropertyName = "IndexedChildren",
+                        ParentPropertyIndex = "b"
+                    }
+                },
+            };
             DataContext = viewModel;
             new WebViewBridge(WebControl, viewModel);
         }

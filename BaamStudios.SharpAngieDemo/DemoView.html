@@ -34,6 +34,14 @@
                 <td>Children[0].Field2:</td>
                 <td><input ng-model="model.Children[0].Field2">{{model.Children[0].Field2}}</td>
             </tr>
+            <tr>
+                <td>IndexedChildren['a'].Field1:</td>
+                <td><input ng-model="model.IndexedChildren['a'].Field1">{{model.IndexedChildren['a'].Field1}}</td>
+            </tr>
+            <tr>
+                <td>IndexedChildren['b'].Field1:</td>
+                <td><input ng-model="model.IndexedChildren['b'].Field1">{{model.IndexedChildren['b'].Field1}}</td>
+            </tr>
         </table>
         <button ng-click="model.Children[0].invokeMethod('DoSomething', 'v1', 'v2')">Children[0].DoSomething</button>
         <textarea id="log" style="width: 90%; height: 200px"></textarea>

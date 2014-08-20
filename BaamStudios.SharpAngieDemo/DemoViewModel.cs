@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Markup;
 using BaamStudios.SharpAngie;
 
 namespace BaamStudios.SharpAngieDemo
@@ -17,6 +18,8 @@ namespace BaamStudios.SharpAngieDemo
         private DemoViewModel _child;
 
         private ObservableCollection<DemoViewModel> _children;
+
+        private Dictionary<string, DemoViewModel> _indexedChildren;
 
         public string Field1
         {
@@ -63,6 +66,18 @@ namespace BaamStudios.SharpAngieDemo
             set
             {
                 SetProperty(ref _children, value);
+            }
+        }
+
+        public Dictionary<string, DemoViewModel> IndexedChildren
+        {
+            get
+            {
+                return _indexedChildren;
+            }
+            set
+            {
+                SetProperty(ref _indexedChildren, value);
             }
         }
 

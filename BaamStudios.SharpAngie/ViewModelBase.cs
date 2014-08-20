@@ -23,7 +23,7 @@ namespace BaamStudios.SharpAngie
         public virtual string ParentPropertyName { get; set; }
 
         [IgnoreDataMember]
-        public virtual int? ParentPropertyIndex { get; set; }
+        public virtual object ParentPropertyIndex { get; set; }
 
         public delegate void DeepPropertyChangedEventHandler(ViewModelBase sender, string propertyPath, object value);
 
@@ -42,7 +42,7 @@ namespace BaamStudios.SharpAngie
             OnDeepPropertyChanged(this, propertyName, null, null, value);
         }
 
-        private void OnDeepPropertyChanged(ViewModelBase sender, string propertyName, int? propertyIndex, string childPath, object value)
+        private void OnDeepPropertyChanged(ViewModelBase sender, string propertyName, object propertyIndex, string childPath, object value)
         {
             var propertyPath = GetPropertyPath(propertyName, propertyIndex, childPath);
 
@@ -53,7 +53,7 @@ namespace BaamStudios.SharpAngie
                 Parent.OnDeepPropertyChanged(sender, ParentPropertyName, ParentPropertyIndex, propertyPath, value);
         }
 
-        private static string GetPropertyPath(string propertyName, int? propertyIndex, string childPropertyPath)
+        private static string GetPropertyPath(string propertyName, object propertyIndex, string childPropertyPath)
         {
             var path = new StringBuilder();
 

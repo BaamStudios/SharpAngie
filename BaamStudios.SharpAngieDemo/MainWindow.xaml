@@ -22,6 +22,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Text="Field1" />
@@ -30,6 +32,8 @@
             <TextBlock Grid.Row="3" Text="Child.Field2" />
             <TextBlock Grid.Row="4" Text="Children[0].Field1" />
             <TextBlock Grid.Row="5" Text="Children[0].Field2" />
+            <TextBlock Grid.Row="6" Text="IndexedChildren['a'].Field1" />
+            <TextBlock Grid.Row="7" Text="IndexedChildren['b'].Field1" />
             <TextBox Grid.Column="1" Text="{Binding Field1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <TextBox Grid.Row="1"
                      Grid.Column="1"
@@ -54,6 +58,16 @@
             <TextBox Grid.Row="5"
                      Grid.Column="1"
                      Text="{Binding Children[0].Field2,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Grid.Row="6"
+                     Grid.Column="1"
+                     Text="{Binding IndexedChildren[a].Field1,
+                                    Mode=TwoWay,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Grid.Row="7"
+                     Grid.Column="1"
+                     Text="{Binding IndexedChildren[b].Field1,
                                     Mode=TwoWay,
                                     UpdateSourceTrigger=PropertyChanged}" />
         </Grid>

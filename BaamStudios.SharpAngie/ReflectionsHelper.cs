@@ -54,11 +54,21 @@ namespace BaamStudios.SharpAngie
                     return;
 
                 var possiblePropertyIndex = propertyNames[i + 1];
-                if (NumberRegex.IsMatch(possiblePropertyIndex))
+                if (currentObject is IEnumerable)
                 {
-                    var propertyIndex = Int32.Parse(possiblePropertyIndex);
-                    currentObject = ((IEnumerable)currentObject).Cast<object>().ElementAt(propertyIndex);
-                    i++;
+                    if (NumberRegex.IsMatch(possiblePropertyIndex))
+                    {
+                        var propertyIndex = Int32.Parse(possiblePropertyIndex);
+                        currentObject = ((IEnumerable) currentObject).Cast<object>().ElementAt(propertyIndex);
+                        i++;
+                    }
+                    else if (currentObject is IDictionary)
+                    {
+                        var key = ((IDictionary) currentObject).Keys.Cast<object>()
+                            .FirstOrDefault(x => x.ToString() == possiblePropertyIndex);
+                        currentObject = ((IDictionary)currentObject)[key];
+                        i++;
+                    }
                 }
             }
 
