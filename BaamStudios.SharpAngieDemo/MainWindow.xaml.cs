@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using DrWPF.Windows.Data;
 
 namespace BaamStudios.SharpAngieDemo
 {
@@ -35,28 +36,10 @@ namespace BaamStudios.SharpAngieDemo
                                         },
                                 Children = new ObservableCollection<DemoViewModel>(new List<DemoViewModel> { new DemoViewModel { Field1 = "baz" } })
                             };
-            viewModel.IndexedChildren = new Dictionary<string, DemoViewModel>
+            viewModel.IndexedChildren = new ObservableDictionary<string, DemoViewModel>
             {
-                {
-                    "a",
-                    new DemoViewModel
-                    {
-                        Field1 = "ia",
-                        Parent = viewModel,
-                        ParentPropertyName = "IndexedChildren",
-                        ParentPropertyIndex = "a"
-                    }
-                },
-                {
-                    "b",
-                    new DemoViewModel
-                    {
-                        Field1 = "ib",
-                        Parent = viewModel,
-                        ParentPropertyName = "IndexedChildren",
-                        ParentPropertyIndex = "b"
-                    }
-                },
+                { "a", new DemoViewModel { Field1 = "ia" } },
+                { "b", new DemoViewModel { Field1 = "ib" } },
             };
             DataContext = viewModel;
             new WebViewBridge(WebControl, viewModel);

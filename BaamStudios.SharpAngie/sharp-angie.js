@@ -65,10 +65,18 @@ function hookModel(model, parentPropertyPath) {
     if (model == null || typeof (model) === 'undefined')
         return model;
     
+    if (typeof (model.propertyNames) === 'undefined') {
+        var propertyNames = [];
+        for (var key in model) {
+            propertyNames.push(key);
+        }
+        model.propertyNames = propertyNames;
+    }
+    
     model.toJSON = function () {
         var result = {};
         for (var p in model) {
-            if (!isBackingField(p)) {
+            if (!isBackingField(p) && p != "propertyNames") {
                 // evaluate getter
                 result[p] = model[p];
             }
@@ -84,7 +92,7 @@ function hookModel(model, parentPropertyPath) {
     };
 
     for (var propertyName in model) {
-        if (!isBackingField(propertyName)) {
+        if (!isBackingField(propertyName) && propertyName != "propertyNames") {
             wrapProperty(model, propertyName, parentPropertyPath);
         }
     }

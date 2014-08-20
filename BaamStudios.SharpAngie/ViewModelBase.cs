@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using BaamStudios.SharpAngie.Annotations;
+using DrWPF.Windows.Data;
 
 namespace BaamStudios.SharpAngie
 {
@@ -146,6 +147,65 @@ namespace BaamStudios.SharpAngie
                     vm.Parent = this;
                     vm.ParentPropertyName = propertyName;
                     vm.ParentPropertyIndex = index;
+                }
+                index++;
+            }
+        }
+
+        protected bool SetProperty<K, T>(ref ObservableDictionary<K, T> backingField, ObservableDictionary<K, T> value,
+            [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(value, backingField))
+            {
+                return false;
+            }
+            if (backingField != null)
+            {
+                UnwireDictionary(backingField, propertyName);
+            }
+            backingField = value;
+            if (backingField != null)
+            {
+                WireDictionary(backingField, propertyName);
+            }
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+
+        private void UnwireDictionary<K, T>(ObservableDictionary<K, T> collection, [CallerMemberName] string propertyName = null)
+        {
+            if (_changeHandlers.ContainsKey(propertyName))
+            {
+                ((INotifyCollectionChanged)collection).CollectionChanged -= _changeHandlers[propertyName];
+            }
+        }
+
+        private void WireDictionary<K, T>(ObservableDictionary<K, T> collection, [CallerMemberName] string propertyName = null)
+        {
+            if (!_changeHandlers.ContainsKey(propertyName))
+            {
+                _changeHandlers.Add(propertyName, (sender, args) =>
+                {
+                    WireDictionaryItems((ObservableDictionary<K, T>)sender, propertyName);
+                    OnPropertyChanged(propertyName);
+                });
+            }
+            ((INotifyCollectionChanged)collection).CollectionChanged += _changeHandlers[propertyName];
+
+            WireDictionaryItems(collection, propertyName);
+        }
+
+        private void WireDictionaryItems<K, T>(ObservableDictionary<K, T> enumerable, string propertyName)
+        {
+            var index = 0;
+            foreach (var key in enumerable.Keys)
+            {
+                var vm = enumerable[key] as ViewModelBase;
+                if (vm != null)
+                {
+                    vm.Parent = this;
+                    vm.ParentPropertyName = propertyName;
+                    vm.ParentPropertyIndex = key;
                 }
                 index++;
             }

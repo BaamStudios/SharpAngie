@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Markup;
 using BaamStudios.SharpAngie;
+using DrWPF.Windows.Data;
 
 namespace BaamStudios.SharpAngieDemo
 {
@@ -19,7 +20,7 @@ namespace BaamStudios.SharpAngieDemo
 
         private ObservableCollection<DemoViewModel> _children;
 
-        private Dictionary<string, DemoViewModel> _indexedChildren;
+        private ObservableDictionary<string, DemoViewModel> _indexedChildren;
 
         public string Field1
         {
@@ -69,7 +70,7 @@ namespace BaamStudios.SharpAngieDemo
             }
         }
 
-        public Dictionary<string, DemoViewModel> IndexedChildren
+        public ObservableDictionary<string, DemoViewModel> IndexedChildren
         {
             get
             {
