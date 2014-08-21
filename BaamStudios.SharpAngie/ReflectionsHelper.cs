@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Data.Odbc;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -24,7 +25,7 @@ namespace BaamStudios.SharpAngie
         /// - myobj.myarrayprop[123].prop1 <br/>
         /// - myobj.myarrayprop.123.prop1 <br/>
         /// </param>
-        public static void GetDeepProperty(object rootObject, string propertyPath, out object targetPropertyOwner, out PropertyInfo targetProperty, out int? targetPropertyIndex)
+        public static void GetDeepProperty(object rootObject, string propertyPath, out object targetPropertyOwner, out PropertyInfo targetProperty, out object targetPropertyIndex)
         {
             targetPropertyOwner = null;
             targetProperty = null;
@@ -36,48 +37,75 @@ namespace BaamStudios.SharpAngie
             // replacing the [] with . is not really necessary when calling only from javascript but it makes this method more compatible with calls from c#.
             var propertyNames = propertyPath.Replace('[', '.').Replace(']', '.').Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 
-            var finalPropertyIsList = NumberRegex.IsMatch(propertyNames.Last());
-            var lastPropertyIndex = finalPropertyIsList
-                ? propertyNames.Length - 3
-                : propertyNames.Length - 2;
+            if (propertyNames.Length == 0)
+                return;
 
-            for (int i = 0; i <= lastPropertyIndex; i++)
+            for (int i = 0; i < propertyNames.Length; i++)
             {
-                var propertyName = propertyNames[i];
-
-                var property = GetProperty(currentObject, propertyName);
-                if (property == null)
-                    return;
-
-                currentObject = property.GetValue(currentObject);
-                if (currentObject == null)
-                    return;
-
-                var possiblePropertyIndex = propertyNames[i + 1];
-                if (currentObject is IEnumerable)
+                if (i < propertyNames.Length - 1)
                 {
-                    if (NumberRegex.IsMatch(possiblePropertyIndex))
+                    var propertyName = propertyNames[i];
+
+                    var currentProperty = GetProperty(currentObject, propertyName);
+                    if (currentProperty == null)
+                        return;
+
+                    var value = currentProperty.GetValue(currentObject);
+                    if (value == null)
+                        return;
+
+                    if (value is IEnumerable)
                     {
-                        var propertyIndex = Int32.Parse(possiblePropertyIndex);
-                        currentObject = ((IEnumerable) currentObject).Cast<object>().ElementAt(propertyIndex);
-                        i++;
+                        var possiblePropertyIndex = propertyNames[i + 1];
+                        if (value is IDictionary)
+                        {
+                            var key = ((IDictionary) value).Keys.Cast<object>()
+                                .FirstOrDefault(x => x.ToString() == possiblePropertyIndex);
+
+                            if (i + 1 == propertyNames.Length - 1)
+                            {
+                                targetPropertyOwner = currentObject;
+                                targetProperty = currentProperty;
+                                targetPropertyIndex = key;
+                                return;
+                            }
+
+                            currentObject = ((IDictionary)value)[key];
+                            i++;
+                            continue;
+                        }
+
+                        if (NumberRegex.IsMatch(possiblePropertyIndex))
+                        {
+                            var key = Int32.Parse(possiblePropertyIndex);
+
+                            if (i + 1 == propertyNames.Length - 1)
+                            {
+                                targetPropertyOwner = currentObject;
+                                targetProperty = currentProperty;
+                                targetPropertyIndex = key;
+                                return;
+                            }
+
+                            currentObject = ((IEnumerable)value).Cast<object>().ElementAt(key);
+                            i++;
+                            continue;
+                        }
+
+                        return;
                     }
-                    else if (currentObject is IDictionary)
+                    else
                     {
-                        var key = ((IDictionary) currentObject).Keys.Cast<object>()
-                            .FirstOrDefault(x => x.ToString() == possiblePropertyIndex);
-                        currentObject = ((IDictionary)currentObject)[key];
-                        i++;
+                        currentObject = value;
                     }
                 }
+                else
+                {
+                    targetPropertyOwner = currentObject;
+                    targetProperty = GetProperty(targetPropertyOwner, propertyNames.Last());
+                    targetPropertyIndex = null;
+                }
             }
-
-            var finalProperty = GetProperty(currentObject, propertyNames[lastPropertyIndex + 1]);
-            if (finalProperty == null) return;
-
-            targetPropertyOwner = currentObject;
-            targetProperty = finalProperty;
-            targetPropertyIndex = finalPropertyIsList ? Int32.Parse(propertyNames[lastPropertyIndex + 2]) : (int?)null;
         }
 
         public static PropertyInfo GetProperty(object obj, string propertyName)
@@ -89,7 +117,7 @@ namespace BaamStudios.SharpAngie
         {
             object targetPropertyOwner;
             PropertyInfo targetProperty;
-            int? targetPropertyIndex;
+            object targetPropertyIndex;
             GetDeepProperty(rootObject, propertyPath, out targetPropertyOwner, out targetProperty,
                 out targetPropertyIndex);
             if (targetProperty == null) return;
@@ -109,20 +137,31 @@ namespace BaamStudios.SharpAngie
             }
         }
 
-        private static object GetPropertyValue(object propertyOwner, PropertyInfo property, int? propertyIndex)
+        private static object GetPropertyValue(object propertyOwner, PropertyInfo property, object propertyIndex)
         {
             var value = property.GetValue(propertyOwner);
             if (propertyIndex == null)
                 return value;
 
-            var enumerable = value as IEnumerable;
-            if (enumerable == null)
-                return null;
+            var dictionary = value as IDictionary;
+            if (dictionary != null)
+            {
+                return dictionary[propertyIndex];
+            }
 
-            return enumerable.Cast<object>().ElementAt(propertyIndex.Value);
+            if (propertyIndex is int)
+            {
+                var enumerable = value as IEnumerable;
+                if (enumerable == null)
+                    return null;
+
+                return enumerable.Cast<object>().ElementAt((int) propertyIndex);
+            }
+
+            return null;
         }
 
-        private static void SetPropertyValue(object propertyOwner, PropertyInfo property, int? propertyIndex, object value)
+        private static void SetPropertyValue(object propertyOwner, PropertyInfo property, object propertyIndex, object value)
         {
             if (propertyIndex == null)
             {
@@ -130,11 +169,22 @@ namespace BaamStudios.SharpAngie
                 return;
             }
 
-            var list = property.GetValue(propertyOwner) as IList;
-            if (list == null)
-                return;
+            var enumerable = property.GetValue(propertyOwner);
 
-            list[propertyIndex.Value] = Convert.ChangeType(value, list.GetType().GenericTypeArguments[0]);
+            var dictionary = enumerable as IDictionary;
+            if (dictionary != null)
+            {
+                dictionary[propertyIndex] = Convert.ChangeType(value, dictionary.GetType().GenericTypeArguments[1]);
+            }
+
+            if (propertyIndex is int)
+            {
+                var list = enumerable as IList;
+                if (list == null)
+                    return;
+
+                list[(int) propertyIndex] = Convert.ChangeType(value, list.GetType().GenericTypeArguments[0]);
+            }
         }
 
         private static void GetDeepMethod(object rootObject, string methodPath, out object methodOwner, out string methodName)
@@ -149,7 +199,7 @@ namespace BaamStudios.SharpAngie
 
                 object targetPropertyOwner;
                 PropertyInfo targetProperty;
-                int? targetPropertyIndex;
+                object targetPropertyIndex;
                 GetDeepProperty(rootObject, propertyPath, out targetPropertyOwner, out targetProperty,
                     out targetPropertyIndex);
                 if (targetProperty == null) return;
